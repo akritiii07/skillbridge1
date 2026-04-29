@@ -7,38 +7,69 @@ function Signup() {
     name: "",
     email: "",
     password: "",
+    college: "",
     location: "",
+    teachSkills: [],
+    learnSkills: [],
+    availability: "Online",
   });
+
+  const [teachInput, setTeachInput] = useState("");
+  const [learnInput, setLearnInput] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+  };
+
+  const addTeachSkill = (e) => {
+    e.preventDefault();
+    if (!teachInput.trim()) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      teachSkills: [...prev.teachSkills, teachInput],
+    }));
+
+    setTeachInput("");
+  };
+
+  const addLearnSkill = (e) => {
+    e.preventDefault();
+    if (!learnInput.trim()) return;
+
+    setFormData((prev) => ({
+      ...prev,
+      learnSkills: [...prev.learnSkills, learnInput],
+    }));
+
+    setLearnInput("");
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
     setLoading(true);
     setError("");
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setLoading(false);
-      return;
-    }
+
     try {
       const response = await authAPI.signup(formData);
+
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         navigate("/dashboard");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Signup failed. Please try again.");
+      setError(err.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -46,117 +77,96 @@ function Signup() {
 
   return (
     <div className="signup-page">
-
       <div className="signup-container">
-
         <Link to="/" className="back">← Back to home</Link>
 
         <div className="signup-card">
-
           <h2>Create your account</h2>
-          <p className="subtitle">
-            Join the skill exchange community
-          </p>
 
           {error && <div className="error-message">{error}</div>}
 
           <form onSubmit={handleSignup}>
-            {/* FULL NAME + EMAIL */}
-            <div className="row">
-              <div className="field">
-                <label>Full Name</label>
-                <input 
-                  type="text" 
-                  name="name"
-                  placeholder="Your name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+            />
 
-              <div className="field">
-                <label>Email</label>
-                <input 
-                  type="email" 
-                  name="email"
-                  placeholder="you@uni.edu"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-            </div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+            />
 
-            {/* PASSWORD */}
-            <div className="field">
-              <label>Password</label>
-              <input 
-                type="password" 
-                name="password"
-                placeholder="Min 6 characters"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+            />
+
+            <input
+              type="text"
+              name="college"
+              placeholder="College"
+              value={formData.college}
+              onChange={handleInputChange}
+            />
+
+            <input
+              type="text"
+              name="location"
+              placeholder="Location"
+              value={formData.location}
+              onChange={handleInputChange}
+            />
+
+            <div>
+              <input
+                type="text"
+                placeholder="Skill you can teach"
+                value={teachInput}
+                onChange={(e) => setTeachInput(e.target.value)}
               />
-              <small>Must be at least 6 characters</small>
+              <button onClick={addTeachSkill}>Add</button>
             </div>
 
-          {/* COLLEGE + LOCATION */}
-          <div className="row">
-            <div className="field">
-              <label>College</label>
-              <input type="text" placeholder="MIT" />
+            <div>
+              <input
+                type="text"
+                placeholder="Skill you want to learn"
+                value={learnInput}
+                onChange={(e) => setLearnInput(e.target.value)}
+              />
+              <button onClick={addLearnSkill}>Add</button>
             </div>
 
-            <div className="field">
-              <label>Location</label>
-              <input type="text" placeholder="Boston, MA" />
-            </div>
-          </div>
-          
-             {/* SKILLS TEACH */}
-          <div className="field">
-            <label>Skills You Can Teach</label>
-            <div className="skill-row">
-              <input type="text" placeholder="e.g. Python" />
-              <button>Add</button>
-            </div>
-            <small>Add skills you can teach others</small>
-          </div>
+            <select
+              name="availability"
+              value={formData.availability}
+              onChange={handleInputChange}
+            >
+              <option>Online</option>
+              <option>Offline</option>
+              <option>Both</option>
+            </select>
 
-          {/* SKILLS LEARN */}
-          <div className="field">
-            <label>Skills You Want to Learn</label>
-            <div className="skill-row">
-              <input type="text" placeholder="e.g. React" />
-              <button>Add</button>
-            </div>
-            <small>What do you want to learn?</small>
-          </div>
-
-
-            {/* AVAILABILITY */}
-          <div className="field">
-            <label>Availability</label>
-            <div className="availability">
-              <button className="active">Online</button>
-              <button>Offline</button>
-              <button>Both</button>
-            </div>
-            <small>Select how you prefer to connect</small>
-          </div>
-
-            {/* SUBMIT */}
-            <button className="signup-btn-main" type="submit" disabled={loading}>
-              {loading ? "Creating Account..." : "Create Account"}
+            <button type="submit" disabled={loading}>
+              {loading ? "Creating..." : "Create Account"}
             </button>
           </form>
 
-          <p className="extra">
-            Already have an account? <Link to="/login">Log in</Link>
+          <p>
+            Already have an account? <Link to="/login">Login</Link>
           </p>
-
         </div>
       </div>
     </div>
