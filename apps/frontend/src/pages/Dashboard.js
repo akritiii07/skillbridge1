@@ -6,28 +6,61 @@ function Dashboard() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // Dummy data for demonstration
-  const dummyData = useMemo(() => ({
-    skills: ["JavaScript", "React", "Node.js", "Python", "UI/UX Design"],
-    learningGoals: ["Machine Learning", "Cloud Computing", "Data Structures"],
-    totalConnections: 12,
-    skillExchanges: 5,
-    badges: [
-      { name: "First Connection", icon: "🤝" },
-      { name: "Skill Sharer", icon: "📚" },
-      { name: "Active Learner", icon: "🎯" }
-    ],
-    recentActivity: [
-      { type: "connection", message: "Connected with Sarah Chen", time: "2 hours ago" },
-      { type: "exchange", message: "Completed skill exchange: JavaScript → Python", time: "1 day ago" },
-      { type: "badge", message: "Earned 'Skill Sharer' badge", time: "3 days ago" }
-    ],
-    suggestedSkills: ["TypeScript", "Docker", "AWS", "GraphQL", "Vue.js"],
-    upcomingExchanges: [
-      { partner: "Mike Johnson", skill: "React", date: "Tomorrow, 3:00 PM" },
-      { partner: "Emma Davis", skill: "Python", date: "Friday, 2:00 PM" }
-    ]
-  }), []);
+  const dummyData = useMemo(
+    () => ({
+      skills: ["C++"],
+      learningGoals: ["Python"],
+      completedSwaps: 0,
+      rating: "N/A",
+
+      progress: [
+        { skill: "Python", percent: 20 },
+      ],
+
+      courses: [
+        {
+          title: "Python for Beginners – Full Course",
+          level: "Beginner",
+          provider: "freeCodeCamp",
+        },
+        {
+          title: "Automate the Boring Stuff with Python",
+          level: "Beginner",
+          provider: "Udemy (Free)",
+        },
+        {
+          title: "Python OOP Tutorial",
+          level: "Intermediate",
+          provider: "Corey Schafer",
+        },
+        {
+          title: "Real Python – Intermediate Tutorials",
+          level: "Intermediate",
+          provider: "Real Python",
+        },
+        {
+          title: "Python Advanced Concepts",
+          level: "Advanced",
+          provider: "Tech With Tim",
+        },
+        {
+          title: "Python Official Documentation",
+          level: "Advanced",
+          provider: "Python.org",
+        },
+      ],
+
+      trending: [
+        "Python +24%",
+        "React +18%",
+        "Machine Learning +31%",
+        "DSA +22%",
+        "UI Design +15%",
+        "Cybersecurity +28%",
+      ],
+    }),
+    []
+  );
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -52,113 +85,147 @@ function Dashboard() {
     navigate("/login");
   };
 
-  if (!user) {
-    return <div className="dashboard-loading">Loading...</div>;
-  }
+  if (!user) return <div className="dashboard-loading">Loading...</div>;
 
   return (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <h1>Welcome back, {user.name}! 👋</h1>
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
-      </div>
+    <div className="ai-dashboard">
+      {/* Sidebar */}
+      <aside className="ai-sidebar">
+        <h2 className="brand">SkillBridge</h2>
 
-      <div className="dashboard-stats">
-        <div className="stat-card">
-          <h3>Your Skills</h3>
-          <p className="stat-number">{user.skills?.length || 0}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Learning Goals</h3>
-          <p className="stat-number">{user.learningGoals?.length || 0}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Connections</h3>
-          <p className="stat-number">{user.totalConnections || 0}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Skill Exchanges</h3>
-          <p className="stat-number">{user.skillExchanges || 0}</p>
-        </div>
-      </div>
+        <ul>
+          <li className="active">🏠 Dashboard</li>
+          <li>👤 My Profile</li>
+          <li onClick={() => navigate("/explore")}>🔍 Find Matches</li>
+          <li>📩 Requests</li>
+          <li>💬 Messages</li>
+          <li>⚙️ Settings</li>
+          <li className="logout-link" onClick={handleLogout}>
+            🚪 Log Out
+          </li>
+        </ul>
+      </aside>
 
-      <div className="dashboard-content">
-        <div className="content-section">
-          <h2>Your Skills</h2>
-          <div className="skills-list">
-            {user.skills?.map((skill, index) => (
-              <span key={index} className="skill-tag">{skill}</span>
-            ))}
+      {/* Main */}
+      <main className="ai-main">
+        {/* Top */}
+        <div className="top-bar">
+          <div>
+            <h1>
+              Welcome back, <span>{user.name}</span>!
+            </h1>
+            <p>Here's your skill exchange overview</p>
+          </div>
+
+          <div className="profile-circle">
+            {user.name?.charAt(0).toUpperCase()}
           </div>
         </div>
 
-        <div className="content-section">
-          <h2>Learning Goals</h2>
-          <div className="goals-list">
-            {user.learningGoals?.map((goal, index) => (
-              <span key={index} className="goal-tag">{goal}</span>
-            ))}
+        {/* Stats */}
+        <div className="stats-grid">
+          <div className="stat-box">
+            <h3>📚 Skills Teaching</h3>
+            <span>{user.skills?.length || 0}</span>
+          </div>
+
+          <div className="stat-box">
+            <h3>🎯 Skills Learning</h3>
+            <span>{user.learningGoals?.length || 0}</span>
+          </div>
+
+          <div className="stat-box">
+            <h3>✅ Completed Swaps</h3>
+            <span>{user.completedSwaps}</span>
+          </div>
+
+          <div className="stat-box">
+            <h3>⭐ Rating</h3>
+            <span>{user.rating}</span>
           </div>
         </div>
-      </div>
 
-      <div className="dashboard-grid">
-        <div className="content-section">
-          <h2>🎖️ Your Badges</h2>
-          <div className="badges-list">
-            {user.badges?.map((badge, index) => (
-              <div key={index} className="badge-item">
-                <span className="badge-icon">{badge.icon}</span>
-                <span className="badge-name">{badge.name}</span>
+        {/* Skills */}
+        <div className="two-grid">
+          <div className="card">
+            <h2>Your Skills</h2>
+            <small>TEACHING</small>
+
+            <div className="tag-wrap">
+              {user.skills?.map((skill, index) => (
+                <span className="green-tag" key={index}>
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="card">
+            <h2>Your Skills</h2>
+            <small>LEARNING</small>
+
+            <div className="tag-wrap">
+              {user.learningGoals?.map((goal, index) => (
+                <span className="purple-tag" key={index}>
+                  {goal}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="card">
+          <h2>Learning Progress</h2>
+
+          {user.progress.map((item, i) => (
+            <div key={i} className="progress-block">
+              <div className="progress-top">
+                <span>{item.skill}</span>
+                <span>{item.percent}%</span>
               </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="content-section">
-          <h2>📅 Upcoming Exchanges</h2>
-          <div className="exchanges-list">
-            {user.upcomingExchanges?.map((exchange, index) => (
-              <div key={index} className="exchange-item">
-                <strong>{exchange.partner}</strong>
-                <p>Teaching: {exchange.skill}</p>
-                <span className="exchange-date">{exchange.date}</span>
+              <div className="progress-bar">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${item.percent}%` }}
+                ></div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="content-section recent-activity">
-        <h2>📝 Recent Activity</h2>
-        <div className="activity-list">
-          {user.recentActivity?.map((activity, index) => (
-            <div key={index} className="activity-item">
-              <p>{activity.message}</p>
-              <span className="activity-time">{activity.time}</span>
             </div>
           ))}
         </div>
-      </div>
 
-      <div className="content-section">
-        <h2>💡 Suggested Skills to Learn</h2>
-        <div className="skills-list">
-          {user.suggestedSkills?.map((skill, index) => (
-            <span key={index} className="suggested-skill-tag">{skill}</span>
-          ))}
+        {/* Courses */}
+        <div className="card">
+          <div className="course-head">
+            <h2>📘 Recommended Courses</h2>
+            <span>View All →</span>
+          </div>
+
+          <div className="courses-grid">
+            {user.courses.map((course, index) => (
+              <div className="course-card" key={index}>
+                <button>{course.level}</button>
+                <h4>{course.title}</h4>
+                <p>{course.provider}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="dashboard-actions">
-        <button className="action-btn" onClick={() => navigate("/explore")}>
-          Explore Skills →
-        </button>
+        {/* Trending */}
+        <div className="card">
+          <h2>🔥 Trending Skills</h2>
 
-        <button className="action-btn" onClick={() => navigate("/resources")}>
-          View Resources →
-        </button>
-      </div>
+          <div className="trend-grid">
+            {user.trending.map((item, index) => (
+              <div className="trend-card" key={index}>
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
