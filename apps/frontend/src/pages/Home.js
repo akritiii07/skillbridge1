@@ -1,5 +1,5 @@
-import skillImage from "../assets/skill-exchange.jpg";
-import communityImage from "../assets/community.jpg";
+import skillImage from "../assets/skill-exchange.png";
+import communityImage from "../assets/community.png";
 function Home() {
   return (
     <>
