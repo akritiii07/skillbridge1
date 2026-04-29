@@ -64,19 +64,27 @@ export const signup = async (req, res) => {
 
     // Create new user
     user = await User.create({
-      name,
-      email,
-      password,
-      college: college || '',
-      location: location || '',
-      skills: skills || [],
-      learningGoals: learningGoals || [],
-      interests: interests || [],
-      availability: availability || 'Online',
-      bio: bio || '',
-      phone: phone || '',
-      profileImage: profileImage || '',
-    });
+  name,
+  email,
+  password,
+  college: college || "",
+  location: location || "",
+  bio: bio || "",
+  phone: phone || "",
+  profileImage: profileImage || "",
+  availability: availability || "Online",
+  skills: (skills || []).map((item) =>
+    typeof item === "string"
+      ? { name: item, proficiency: "Intermediate" }
+      : item
+  ),
+  learningGoals: (learningGoals || []).map((item) =>
+    typeof item === "string"
+      ? { name: item }
+      : item
+  ),
+  interests: interests || [],
+});
 
     // Initialize default badges
     await Badge.initDefaultBadges();
@@ -263,26 +271,28 @@ export const getUserById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    res.status(200).json({
-      success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        college: user.college,
-        location: user.location,
-        bio: user.bio,
-        skills: user.skills,
-        learningGoals: user.learningGoals,
-        interests: user.interests,
-        profileImage: user.profileImage,
-        badges: user.badges,
-        rating: user.rating,
-        totalConnections: user.totalConnections,
-        skillExchanges: user.skillExchanges,
-        lastActive: user.lastActive,
-        createdAt: user.createdAt,
-      },
-    });
+    res.status(201).json({
+  success: true,
+  token,
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    college: user.college,
+    location: user.location,
+    skills: user.skills,
+    learningGoals: user.learningGoals,
+    interests: user.interests,
+    availability: user.availability,
+    bio: user.bio,
+    phone: user.phone,
+    profileImage: user.profileImage,
+    badges: user.badges,
+    rating: user.rating,
+    totalConnections: user.totalConnections,
+  },
+});
+
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
