@@ -110,8 +110,8 @@ export const signup = async (req, res) => {
       interests: interests || [],
     });
 
-    await Badge.initDefaultBadges();
-    await assignBadges(user);
+       // await Badge.initDefaultBadges();
+      // await assignBadges(user);
 
     const token = generateToken(user._id);
 
