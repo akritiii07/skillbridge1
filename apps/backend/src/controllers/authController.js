@@ -67,22 +67,27 @@ export const signup = async (req, res) => {
   name,
   email,
   password,
+
   college: college || "",
   location: location || "",
-  bio: bio || "",
-  phone: phone || "",
-  profileImage: profileImage || "",
+
   availability: availability || "Online",
-  skills: (skills || []).map((item) =>
+
+  teachSkills: teachSkills || [],
+  learnSkills: learnSkills || [],
+
+  skills: (skills || teachSkills || []).map((item) =>
     typeof item === "string"
       ? { name: item, proficiency: "Intermediate" }
       : item
   ),
-  learningGoals: (learningGoals || []).map((item) =>
+
+  learningGoals: (learningGoals || learnSkills || []).map((item) =>
     typeof item === "string"
       ? { name: item }
       : item
   ),
+
   interests: interests || [],
 });
 
