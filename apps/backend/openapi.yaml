@@ -1,0 +1,127 @@
+openapi: 3.0.0
+info:
+  title: SkillBridge API
+  version: 1.0.0
+  description: API documentation for SkillBridge backend
+servers:
+  - url: http://localhost:5000/api
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                college:
+                  type: string
+                location:
+                  type: string
+                skills:
+                  type: array
+                  items:
+                    type: object
+                learningGoals:
+                  type: array
+                  items:
+                    type: object
+                interests:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: User registered
+  /auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+  /users:
+    get:
+      summary: Get all users
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: skill
+          schema:
+            type: string
+        - in: query
+          name: college
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of users
+  /connections/request:
+    post:
+      summary: Send connection request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipientId:
+                  type: string
+                message:
+                  type: string
+                skillToTeach:
+                  type: string
+                skillToLearn:
+                  type: string
+      responses:
+        '201':
+          description: Connection request sent
+  /exchanges:
+    post:
+      summary: Create skill exchange
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                teacherId:
+                  type: string
+                skill:
+                  type: string
+                notes:
+                  type: string
+      responses:
+        '201':
+          description: Skill exchange created

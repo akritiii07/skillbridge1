@@ -1,0 +1,25 @@
+{
+  "name": "skillbridge-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "apps/backend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/backend\" \"npm run dev --workspace=apps/frontend\"",
+    "build": "npm run build --workspace=apps/frontend && npm run build --workspace=apps/backend",
+    "start": "npm start --workspace=apps/frontend",
+    "backend": "npm run dev --workspace=apps/backend",
+    "frontend": "npm start --workspace=apps/frontend"
+  },
+  "dependencies": {
+    "concurrently": "^9.1.2",
+    "pdf-lib": "^1.17.1",
+    "pdf2json": "^4.0.3",
+    "pdfjs-dist": "^5.7.284"
+  },
+  "devDependencies": {
+    "pdf-parse": "^2.4.5"
+  }
+}
