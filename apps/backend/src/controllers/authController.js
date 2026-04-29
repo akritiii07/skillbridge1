@@ -215,7 +215,19 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, bio, college, location, phone, skills, learningGoals, interests, profileImage } = req.body;
+    const {
+  name,
+  email,
+  password,
+  college,
+  location,
+  skills,
+  learningGoals,
+  teachSkills,
+  learnSkills,
+  availability,
+  interests
+} = req.body;
 
     const user = await User.findById(req.userId);
     
