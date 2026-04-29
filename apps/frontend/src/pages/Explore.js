@@ -1,42 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { userAPI } from "../services/userApi";
 import "../style.css";
-
-
-function Explore() {
-  const [users, setUsers] = useState([]);
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const res = await userAPI.getAll();
-      setUsers(res.data.users || []);
-    } catch (err) {
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await userAPI.getAll({ search });
-      setUsers(res.data.users || []);
-    } catch (err) {
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-
-    const users = [
+ const users = [
   {
     name: "Alex Chen",
     college: "MIT",
@@ -110,6 +75,40 @@ function Explore() {
     img: "https://i.pravatar.cc/100?img=30",
   },
 ];
+
+function Explore() {
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await userAPI.getAll();
+      setUsers(res.data.users || []);
+    } catch (err) {
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await userAPI.getAll({ search });
+      setUsers(res.data.users || []);
+    } catch (err) {
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   return (
