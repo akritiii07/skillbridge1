@@ -1,42 +1,41 @@
-import User from '../models/User.js';
-import Badge from '../models/Badge.js';
-import jwt from 'jsonwebtoken';
+import User from "../models/User.js";
+import Badge from "../models/Badge.js";
+import jwt from "jsonwebtoken";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '7d',
+    expiresIn: process.env.JWT_EXPIRE || "7d",
   });
 };
 
-// Assign badges based on user activity
+// Assign badges
 const assignBadges = async (user) => {
   const badges = await Badge.find({});
   const newBadges = [];
 
   for (const badge of badges) {
-    // Check if user already has this badge
     if (user.badges.includes(badge._id)) continue;
 
     let shouldAssign = false;
 
     switch (badge.criteria) {
-      case 'connections':
+      case "connections":
         shouldAssign = user.totalConnections >= badge.requiredValue;
         break;
-      case 'skills_count':
+      case "skills_count":
         shouldAssign = user.skills.length >= badge.requiredValue;
         break;
-      case 'learning_count':
+      case "learning_count":
         shouldAssign = user.learningGoals.length >= badge.requiredValue;
         break;
-      case 'exchanges':
+      case "exchanges":
         shouldAssign = user.skillExchanges >= badge.requiredValue;
+        break;
+      default:
         break;
     }
 
-    if (shouldAssign) {
-      newBadges.push(badge._id);
-    }
+    if (shouldAssign) newBadges.push(badge._id);
   }
 
   if (newBadges.length > 0) {
@@ -47,60 +46,75 @@ const assignBadges = async (user) => {
   return newBadges;
 };
 
+// SIGNUP
 export const signup = async (req, res) => {
   try {
-    const {name, email, password, college, location, skills, learningGoals, interests, availability, bio, phone, profileImage} = req.body;
+    const {
+      name,
+      email,
+      password,
+      college,
+      location,
+      skills,
+      learningGoals,
+      teachSkills,
+      learnSkills,
+      interests,
+      availability,
+      bio,
+      phone,
+      profileImage,
+    } = req.body;
 
-    // Validation
     if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide all required fields' });
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields",
+      });
     }
 
-    // Check if user already exists
     let user = await User.findOne({ email });
+
     if (user) {
-      return res.status(400).json({ success: false, message: 'User already exists' });
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
     }
 
-    // Create new user
     user = await User.create({
-  name,
-  email,
-  password,
+      name,
+      email,
+      password,
 
-  college: college || "",
-  location: location || "",
+      college: college || "",
+      location: location || "",
+      bio: bio || "",
+      phone: phone || "",
+      profileImage: profileImage || "",
+      availability: availability || "Online",
 
-  availability: availability || "Online",
+      teachSkills: teachSkills || [],
+      learnSkills: learnSkills || [],
 
-  teachSkills: teachSkills || [],
-  learnSkills: learnSkills || [],
+      skills: (skills || teachSkills || []).map((item) =>
+        typeof item === "string"
+          ? { name: item, proficiency: "Intermediate" }
+          : item
+      ),
 
-  skills: (skills || teachSkills || []).map((item) =>
-    typeof item === "string"
-      ? { name: item, proficiency: "Intermediate" }
-      : item
-  ),
+      learningGoals: (learningGoals || learnSkills || []).map((item) =>
+        typeof item === "string" ? { name: item } : item
+      ),
 
-  learningGoals: (learningGoals || learnSkills || []).map((item) =>
-    typeof item === "string"
-      ? { name: item }
-      : item
-  ),
+      interests: interests || [],
+    });
 
-  interests: interests || [],
-});
-
-    // Initialize default badges
     await Badge.initDefaultBadges();
-
-    // Assign initial badges
     await assignBadges(user);
 
-    // Generate token
     const token = generateToken(user._id);
 
-    // Update last active
     user.lastActive = new Date();
     await user.save();
 
@@ -113,8 +127,14 @@ export const signup = async (req, res) => {
         email: user.email,
         college: user.college,
         location: user.location,
+        bio: user.bio,
+        phone: user.phone,
+        profileImage: user.profileImage,
+        availability: user.availability,
         skills: user.skills,
         learningGoals: user.learningGoals,
+        teachSkills: user.teachSkills,
+        learnSkills: user.learnSkills,
         interests: user.interests,
         badges: user.badges,
         rating: user.rating,
@@ -122,206 +142,143 @@ export const signup = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+// LOGIN
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide email and password' });
+      return res.status(400).json({
+        success: false,
+        message: "Please provide email and password",
+      });
     }
 
-    // Check if user exists
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select("+password");
+
     if (!user) {
-      return res.status(400).json({ success: false, message: 'Invalid credentials' });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
-    // Check if password matches
     const isMatch = await user.matchPassword(password);
+
     if (!isMatch) {
-      return res.status(400).json({ success: false, message: 'Invalid credentials' });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
 
-    // Check if user is active
-    if (!user.isActive) {
-      return res.status(403).json({ success: false, message: 'Account is deactivated' });
-    }
-
-    // Generate token
     const token = generateToken(user._id);
 
-    // Update last active
     user.lastActive = new Date();
     await user.save();
 
     res.status(200).json({
       success: true,
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        college: user.college,
-        location: user.location,
-        skills: user.skills,
-        learningGoals: user.learningGoals,
-        interests: user.interests,
-        bio: user.bio,
-        profileImage: user.profileImage,
-        badges: user.badges,
-        rating: user.rating,
-        totalConnections: user.totalConnections,
-        skillExchanges: user.skillExchanges,
-      },
+      user: user.getPublicProfile(),
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+// PROFILE
 export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).populate('badges');
-    
+    const user = await User.findById(req.userId).populate("badges");
+
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     res.status(200).json({
       success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        college: user.college,
-        location: user.location,
-        bio: user.bio,
-        skills: user.skills,
-        learningGoals: user.learningGoals,
-        interests: user.interests,
-        profileImage: user.profileImage,
-        badges: user.badges,
-        rating: user.rating,
-        totalConnections: user.totalConnections,
-        skillExchanges: user.skillExchanges,
-        lastActive: user.lastActive,
-        createdAt: user.createdAt,
-      },
+      user: user.getPublicProfile(),
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+// UPDATE PROFILE
 export const updateProfile = async (req, res) => {
   try {
-    const {
-  name,
-  email,
-  password,
-  college,
-  location,
-  skills,
-  learningGoals,
-  teachSkills,
-  learnSkills,
-  availability,
-  interests
-} = req.body;
-
     const user = await User.findById(req.userId);
-    
+
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    // Update fields
-    if (name) user.name = name;
-    if (bio !== undefined) user.bio = bio;
-    if (college !== undefined) user.college = college;
-    if (location !== undefined) user.location = location;
-    if (phone !== undefined) user.phone = phone;
-    if (skills) user.skills = skills;
-    if (learningGoals) user.learningGoals = learningGoals;
-    if (interests) user.interests = interests;
-    if (profileImage !== undefined) user.profileImage = profileImage;
+    Object.assign(user, req.body);
 
     await user.save();
-
-    // Check for new badges
-    const newBadges = await assignBadges(user);
+    await assignBadges(user);
 
     res.status(200).json({
       success: true,
-      message: newBadges.length > 0 ? 'Profile updated and new badges earned!' : 'Profile updated successfully',
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        college: user.college,
-        location: user.location,
-        bio: user.bio,
-        skills: user.skills,
-        learningGoals: user.learningGoals,
-        interests: user.interests,
-        profileImage: user.profileImage,
-        badges: user.badges,
-      },
+      message: "Profile updated successfully",
+      user: user.getPublicProfile(),
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+// GET USER BY ID
 export const getUserById = async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    const user = await User.findById(id).populate('badges');
-    
+    const user = await User.findById(req.params.id).populate("badges");
+
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    res.status(201).json({
-  success: true,
-  token,
-  user: {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    college: user.college,
-    location: user.location,
-    skills: user.skills,
-    learningGoals: user.learningGoals,
-    interests: user.interests,
-    availability: user.availability,
-    bio: user.bio,
-    phone: user.phone,
-    profileImage: user.profileImage,
-    badges: user.badges,
-    rating: user.rating,
-    totalConnections: user.totalConnections,
-  },
-});
-
+    res.status(200).json({
+      success: true,
+      user: user.getPublicProfile(),
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+// LOGOUT
 export const logout = async (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      message: 'Logged out successfully',
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
 };
