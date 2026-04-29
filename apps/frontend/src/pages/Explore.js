@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { userAPI } from "../services/userApi";
 import "../style.css";
@@ -37,6 +35,81 @@ function Explore() {
     } finally {
       setLoading(false);
     }
+
+    const users = [
+  {
+    name: "Alex Chen",
+    college: "MIT",
+    location: "Boston, MA",
+    rating: "4.8",
+    teaches: ["React", "JavaScript", "Node.js"],
+    learns: ["Python", "Machine Learning"],
+    img: "https://i.pravatar.cc/100?img=1",
+  },
+  {
+    name: "Maya Patel",
+    college: "Stanford",
+    location: "Palo Alto, CA",
+    rating: "4.9",
+    teaches: ["Python", "ML", "SQL"],
+    learns: ["React", "UI Design"],
+    img: "https://i.pravatar.cc/100?img=5",
+  },
+  {
+    name: "Jordan Rivera",
+    college: "UCLA",
+    location: "Los Angeles, CA",
+    rating: "4.7",
+    teaches: ["UI Design", "Figma", "Graphic Design"],
+    learns: ["Node.js", "Python"],
+    img: "https://i.pravatar.cc/100?img=8",
+  },
+  {
+    name: "Priya Sharma",
+    college: "Georgia Tech",
+    location: "Atlanta, GA",
+    rating: "4.6",
+    teaches: ["Flutter", "Dart", "Firebase"],
+    learns: ["React", "AWS"],
+    img: "https://i.pravatar.cc/100?img=12",
+  },
+  {
+    name: "Sam Wilson",
+    college: "Carnegie Mellon",
+    location: "Pittsburgh, PA",
+    rating: "4.5",
+    teaches: ["Cybersecurity", "Linux", "Networking"],
+    learns: ["UI Design", "Web Dev"],
+    img: "https://i.pravatar.cc/100?img=15",
+  },
+  {
+    name: "Luna Zhang",
+    college: "UC Berkeley",
+    location: "Berkeley, CA",
+    rating: "4.9",
+    teaches: ["Machine Learning", "TensorFlow", "Python"],
+    learns: ["Graphic Design"],
+    img: "https://i.pravatar.cc/100?img=20",
+  },
+  {
+    name: "Carlos Mendez",
+    college: "UT Austin",
+    location: "Austin, TX",
+    rating: "4.4",
+    teaches: ["Unity", "C#", "Game Dev"],
+    learns: ["ML", "React"],
+    img: "https://i.pravatar.cc/100?img=25",
+  },
+  {
+    name: "Aisha Johnson",
+    college: "Howard University",
+    location: "Washington, DC",
+    rating: "4.7",
+    teaches: ["SEO", "Content Writing", "Marketing"],
+    learns: ["JavaScript", "HTML"],
+    img: "https://i.pravatar.cc/100?img=30",
+  },
+];
   };
 
   return (
