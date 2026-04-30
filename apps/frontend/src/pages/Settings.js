@@ -1,0 +1,6 @@
+/* Settings.js */
+
+function Settings() {
+  return <h1 style={{padding:"40px"}}>⚙️ Settings</h1>;
+}
+export default Settings;

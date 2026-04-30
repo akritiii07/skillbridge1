@@ -13,9 +13,7 @@ function Dashboard() {
       completedSwaps: 0,
       rating: "N/A",
 
-      progress: [
-        { skill: "Python", percent: 20 },
-      ],
+      progress: [{ skill: "Python", percent: 20 }],
 
       courses: [
         {
@@ -93,13 +91,61 @@ function Dashboard() {
       <aside className="ai-sidebar">
         <h2 className="brand">SkillBridge</h2>
 
-        <ul>
-          <li className="active">🏠 Dashboard</li>
-          <li>👤 My Profile</li>
-          <li onClick={() => navigate("/explore")}>🔍 Find Matches</li>
-          <li>📩 Requests</li>
-          <li>💬 Messages</li>
-          <li>⚙️ Settings</li>
+        <ul className="sidebar-menu">
+          <li
+            className={
+              window.location.pathname === "/dashboard" ? "active" : ""
+            }
+            onClick={() => navigate("/dashboard")}
+          >
+            🏠 Dashboard
+          </li>
+
+          <li
+            className={
+              window.location.pathname === "/profile" ? "active" : ""
+            }
+            onClick={() => navigate("/profile")}
+          >
+            👤 My Profile
+          </li>
+
+          <li
+            className={
+              window.location.pathname === "/explore" ? "active" : ""
+            }
+            onClick={() => navigate("/explore")}
+          >
+            🔍 Find Matches
+          </li>
+
+          <li
+            className={
+              window.location.pathname === "/requests" ? "active" : ""
+            }
+            onClick={() => navigate("/requests")}
+          >
+            📩 Requests
+          </li>
+
+          <li
+            className={
+              window.location.pathname === "/messages" ? "active" : ""
+            }
+            onClick={() => navigate("/messages")}
+          >
+            💬 Messages
+          </li>
+
+          <li
+            className={
+              window.location.pathname === "/settings" ? "active" : ""
+            }
+            onClick={() => navigate("/settings")}
+          >
+            ⚙️ Settings
+          </li>
+
           <li className="logout-link" onClick={handleLogout}>
             🚪 Log Out
           </li>
@@ -223,17 +269,17 @@ function Dashboard() {
                 {item}
               </div>
             ))}
-            /* Dashboard.js me Trending Skills ke niche ye add karo */
+          </div>
+        </div>
 
-<div className="card">
-  <h2>🎯 Suggested Next Skills</h2>
+        {/* Suggested Next Skills */}
+        <div className="card">
+          <h2>🎯 Suggested Next Skills</h2>
 
-  <div className="tag-wrap">
-    <span className="next-tag">Data Science</span>
-    <span className="next-tag">Machine Learning</span>
-    <span className="next-tag">Django</span>
-  </div>
-</div>
+          <div className="tag-wrap">
+            <span className="next-tag">Data Science</span>
+            <span className="next-tag">Machine Learning</span>
+            <span className="next-tag">Django</span>
           </div>
         </div>
       </main>
